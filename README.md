@@ -30,9 +30,12 @@ change — only the macro's contents do.
 
 ## Install
 
-1. Download this repo as a ZIP (Code → Download ZIP) or clone it.
-2. Copy the `MacroSwap` folder into your WoW `Interface/AddOns/` directory,
-   so you end up with `Interface/AddOns/MacroSwap/MacroSwap.toc`.
+1. Grab the zip from the [latest release](https://github.com/scbasss/MacroSwap/releases/latest)
+   (not GitHub's "Code → Download ZIP" button — that one names the folder
+   `MacroSwap-master`, which won't load; the release zip is already named
+   and structured correctly).
+2. Extract it into your WoW `Interface/AddOns/` directory, so you end up
+   with `Interface/AddOns/MacroSwap/MacroSwap.toc`.
 3. `/reload` or restart the game.
 
 ## Usage
