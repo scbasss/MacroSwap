@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="badgeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2fb8a6"/>
+      <stop offset="1" stop-color="#1c7a6e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- background -->
+  <circle cx="100" cy="100" r="98" fill="#171b22"/>
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#3a4150" stroke-width="2"/>
+
+  <!-- targeting reticle -->
+  <circle cx="100" cy="100" r="62" fill="none" stroke="#c9a24b" stroke-width="7"/>
+  <line x1="100" y1="22" x2="100" y2="46" stroke="#c9a24b" stroke-width="7" stroke-linecap="round"/>
+  <line x1="100" y1="154" x2="100" y2="178" stroke="#c9a24b" stroke-width="7" stroke-linecap="round"/>
+  <line x1="22" y1="100" x2="46" y2="100" stroke="#c9a24b" stroke-width="7" stroke-linecap="round"/>
+  <line x1="154" y1="100" x2="178" y2="100" stroke="#c9a24b" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- swap arrows looping the reticle -->
+  <path d="M 100 46 A 54 54 0 0 1 152 92" fill="none" stroke="#e8e3d8" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="152,92 165,88 158,102" fill="#e8e3d8"/>
+
+  <path d="M 100 154 A 54 54 0 0 1 48 108" fill="none" stroke="#e8e3d8" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="48,108 35,112 42,98" fill="#e8e3d8"/>
+
+  <!-- macro action-bar badge, centered -->
+  <rect x="72" y="72" width="56" height="56" rx="10" fill="url(#badgeGrad)" stroke="#0d3a34" stroke-width="3"/>
+  <rect x="72" y="72" width="56" height="56" rx="10" fill="none" stroke="#7fe0d1" stroke-width="1.5" opacity="0.6"/>
+</svg>

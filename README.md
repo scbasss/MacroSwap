@@ -1,5 +1,7 @@
 # MacroSwap
 
+<p align="center"><img src="logo.svg" width="140" alt="MacroSwap logo"></p>
+
 A World of Warcraft addon for TBC Classic (Anniversary) that swaps a macro's
 text based on your current target — automatically, and without touching
 protected actions, so it keeps working in combat.
