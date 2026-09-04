@@ -54,8 +54,31 @@ local function dprint(...)
     print("|cff33ff99MacroSwap debug:|r " .. table.concat(parts, " "))
 end
 
+-- profile.targetMode: "name" (match profile.target literally, default for
+-- backward compatibility), "boss" (target is in the TBC boss database), or
+-- "trash" (target is a hostile, attackable, non-player NPC that ISN'T in the
+-- boss database).
+local function TargetMatches(profile)
+    local mode = profile.targetMode or "name"
+    if not UnitExists("target") then return false end
+    local curName = UnitName("target")
+
+    if mode == "boss" then
+        return MacroSwap_Bosses[curName:lower()] == true
+    elseif mode == "trash" then
+        if MacroSwap_Bosses[curName:lower()] then return false end
+        return not UnitIsPlayer("target") and UnitCanAttack("player", "target")
+    else
+        return profile.target ~= nil and curName:lower() == profile.target:lower()
+    end
+end
+
 local function UpdateProfile(profile, label)
-    if not profile.target or not profile.originalMacro or not profile.swapMacro then
+    local mode = profile.targetMode or "name"
+    if mode == "name" and not profile.target then
+        return
+    end
+    if not profile.originalMacro or not profile.swapMacro then
         return
     end
 
@@ -72,7 +95,7 @@ local function UpdateProfile(profile, label)
     end
 
     local curTarget = UnitExists("target") and UnitName("target") or nil
-    local onTarget = curTarget ~= nil and curTarget:lower() == profile.target:lower()
+    local onTarget = TargetMatches(profile)
 
     local swapIdx = FindMacroIndex(profile.swapMacro)
     local swapBody = swapIdx ~= 0 and select(3, GetMacroInfo(swapIdx)) or nil
@@ -248,12 +271,60 @@ end
 
 local originalEdit = MakeLabeledEditBox(tabRow, "Original macro (already on your bar)")
 local swapEdit = MakeLabeledEditBox(originalEdit, "Swap-in macro (doesn't need to be on a bar)")
-local targetEdit = MakeLabeledEditBox(swapEdit, "Target name")
+
+local targetLabel = win:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+targetLabel:SetPoint("TOPLEFT", swapEdit, "BOTTOMLEFT", 0, -16)
+targetLabel:SetText("Target")
+
+-- Mode row: pick a literal target name, OR any recognized TBC boss, OR any
+-- hostile non-boss NPC ("trash"). Selected mode is shown disabled, same
+-- visual convention as the tab buttons above.
+local modeRow = CreateFrame("Frame", nil, win)
+modeRow:SetPoint("TOPLEFT", targetLabel, "BOTTOMLEFT", 6, -4)
+modeRow:SetSize(320, 22)
+
+local MODE_LABELS = { name = "Specific", boss = "Boss", trash = "Trash" }
+local MODE_ORDER = { "name", "boss", "trash" }
+local modeButtons = {}
+do
+    local x = 0
+    for _, mode in ipairs(MODE_ORDER) do
+        local btn = CreateFrame("Button", nil, modeRow, "UIPanelButtonTemplate")
+        btn:SetSize(80, 22)
+        btn:SetPoint("TOPLEFT", modeRow, "TOPLEFT", x, 0)
+        btn:SetText(MODE_LABELS[mode])
+        modeButtons[mode] = btn
+        x = x + 84
+    end
+end
+
+local targetEdit = CreateFrame("EditBox", nil, win, "InputBoxTemplate")
+targetEdit:SetSize(300, 20)
+targetEdit:SetPoint("TOPLEFT", modeRow, "BOTTOMLEFT", 0, -8)
+targetEdit:SetAutoFocus(false)
+targetEdit:SetScript("OnEscapePressed", targetEdit.ClearFocus)
 
 local status = win:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-status:SetPoint("TOPLEFT", targetEdit, "BOTTOMLEFT", -6, -14)
 status:SetWidth(348)
 status:SetJustifyH("LEFT")
+
+-- Positions `status` right below whatever is actually visible in the target
+-- section (the name edit box only shows up in "Specific" mode), and hides/
+-- shows that edit box to match. Called on every mode change and tab switch.
+local function LayoutTargetSection(profile)
+    local mode = profile.targetMode or "name"
+    status:ClearAllPoints()
+    if mode == "name" then
+        targetEdit:Show()
+        status:SetPoint("TOPLEFT", targetEdit, "BOTTOMLEFT", -6, -14)
+    else
+        targetEdit:Hide()
+        status:SetPoint("TOPLEFT", modeRow, "BOTTOMLEFT", 0, -14)
+    end
+    for m, btn in pairs(modeButtons) do
+        btn:SetEnabled(m ~= mode)
+    end
+end
 
 local function CurrentProfile()
     return db.profiles[db.selectedProfile]
@@ -268,7 +339,9 @@ local function RefreshStatus()
     if profile.swapMacro and FindMacroIndex(profile.swapMacro) == 0 then
         table.insert(lines, "|cffff0000Swap-in macro '" .. profile.swapMacro .. "' not found - create it first.|r")
     end
-    if #lines == 0 and profile.originalMacro and profile.swapMacro and profile.target then
+    local mode = profile.targetMode or "name"
+    local targetOk = (mode ~= "name") or profile.target
+    if #lines == 0 and profile.originalMacro and profile.swapMacro and targetOk then
         table.insert(lines, "|cff33ff99Ready.|r")
     end
     status:SetText(table.concat(lines, "\n"))
@@ -282,6 +355,7 @@ local function SelectProfile(idx)
     originalEdit:SetText(profile.originalMacro or "")
     swapEdit:SetText(profile.swapMacro or "")
     targetEdit:SetText(profile.target or "")
+    LayoutTargetSection(profile)
     RefreshStatus()
     RebuildTabs()
 end
@@ -387,6 +461,21 @@ local function CommitTarget(text)
     UpdateAllMacros()
 end
 
+local function CommitMode(mode)
+    local profile = CurrentProfile()
+    if (profile.targetMode or "name") == mode then return end
+    profile.targetMode = mode
+    lastAppliedMap[profile] = nil
+    LayoutTargetSection(profile)
+    RefreshStatus()
+    RebuildTabs() -- also re-fits the window height for the section change
+    UpdateAllMacros()
+end
+
+for mode, btn in pairs(modeButtons) do
+    btn:SetScript("OnClick", function() CommitMode(mode) end)
+end
+
 -- Commit on every keystroke (not just Enter/focus-lost) so a value typed and
 -- then left as-is (window closed, UI reloaded, logged out) is never lost
 -- waiting on a focus event that might not fire in time.
@@ -407,6 +496,7 @@ win:SetScript("OnShow", function()
     originalEdit:SetText(profile.originalMacro or "")
     swapEdit:SetText(profile.swapMacro or "")
     targetEdit:SetText(profile.target or "")
+    LayoutTargetSection(profile)
     RefreshStatus()
     RebuildTabs()
 end)

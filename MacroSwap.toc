@@ -6,4 +6,5 @@
 ## SavedVariables: MacroSwapDB
 ## SavedVariablesPerCharacter: MacroSwapDBChar
 
+BossList.lua
 MacroSwap.lua
