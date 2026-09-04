@@ -69,4 +69,4 @@ of combat.
 
 ## License
 
-MIT — do whatever you want with it.
+All rights reserved. See [LICENSE](LICENSE).
