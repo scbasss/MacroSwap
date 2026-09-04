@@ -6,6 +6,12 @@
     </linearGradient>
   </defs>
 
+  <!-- full-bleed square background, no transparent corners -->
+  <rect x="0" y="0" width="200" height="200" fill="#171b22"/>
+
+  <!-- outer ring for a bit of edge definition -->
+  <circle cx="100" cy="100" r="98" fill="none" stroke="#3a4150" stroke-width="2"/>
+
   <!-- targeting reticle -->
   <circle cx="100" cy="100" r="62" fill="none" stroke="#c9a24b" stroke-width="7"/>
   <line x1="100" y1="22" x2="100" y2="46" stroke="#c9a24b" stroke-width="7" stroke-linecap="round"/>
@@ -14,11 +20,11 @@
   <line x1="154" y1="100" x2="178" y2="100" stroke="#c9a24b" stroke-width="7" stroke-linecap="round"/>
 
   <!-- swap arrows looping the reticle -->
-  <path d="M 100 46 A 54 54 0 0 1 152 92" fill="none" stroke="#1c7a6e" stroke-width="6" stroke-linecap="round"/>
-  <polygon points="152,92 165,88 158,102" fill="#1c7a6e"/>
+  <path d="M 100 46 A 54 54 0 0 1 152 92" fill="none" stroke="#e8e3d8" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="152,92 165,88 158,102" fill="#e8e3d8"/>
 
-  <path d="M 100 154 A 54 54 0 0 1 48 108" fill="none" stroke="#1c7a6e" stroke-width="6" stroke-linecap="round"/>
-  <polygon points="48,108 35,112 42,98" fill="#1c7a6e"/>
+  <path d="M 100 154 A 54 54 0 0 1 48 108" fill="none" stroke="#e8e3d8" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="48,108 35,112 42,98" fill="#e8e3d8"/>
 
   <!-- macro action-bar badge, centered -->
   <rect x="72" y="72" width="56" height="56" rx="10" fill="url(#badgeGrad)" stroke="#0d3a34" stroke-width="3"/>
