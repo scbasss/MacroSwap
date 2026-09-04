@@ -1,8 +1,8 @@
 ## Interface: 20505
 ## Title: MacroSwap
-## Notes: Swaps a macro's text based on your current target, only while targeting them
+## Notes: Swaps a macro's text based on your current target - by name, or any Classic/TBC boss, or any non-boss trash
 ## Author: Gerbage/Alms
-## Version: 1.0
+## Version: 2.0
 ## SavedVariables: MacroSwapDB
 ## SavedVariablesPerCharacter: MacroSwapDBChar
 
